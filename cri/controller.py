@@ -199,6 +199,7 @@ from cri.dummy.dummy_controller import DummyController
 from cri.dobot.magician_controller import MagicianController
 from cri.dobot.mg400_controller import MG400Controller
 from cri.dobot.cr_controller import CRController
+from cri.dobot.E6_controller import E6Controller
 from cri.ur.rtde_controller import RTDEController
 from cri.sim.sim_controller import SimController
 from cri.franka.pyfranka_controller import PyfrankaController
@@ -210,6 +211,7 @@ Controller = {
     'magician': MagicianController,
     'mg400': MG400Controller,
     'cr': CRController,
+    'E6': E6Controller,
     'ur': RTDEController,
     'sim': SimController,
     'franka': PyfrankaController
