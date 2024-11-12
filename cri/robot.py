@@ -5,6 +5,7 @@ import queue
 from abc import ABC, abstractmethod
 from threading import Thread
 
+import ipdb
 import numpy as np
 
 from cri.transforms import euler2quat, quat2euler, transform, inv_transform, frame
@@ -323,6 +324,9 @@ class SyncRobot(Robot):
         return self.controller.info
 
     @property
+    def get_robot_mode(self):
+        return self.controller.get_robot_mode
+    @property
     def axes(self):
         """Returns the Euler axes used to specify frames and poses.
         """
@@ -452,6 +456,7 @@ class SyncRobot(Robot):
         base_pose_q = self.controller.commanded_pose
         pose_q = transform(base_pose_q, self._coord_frame_q)
         frame_q = frame(pose_q, self._tcp_q)
+
         return quat2euler(frame_q, self._axes)
 
     @property
@@ -482,6 +487,24 @@ class SyncRobot(Robot):
         tcp_pose_q = inv_transform(self._tcp_q, pose_q)
         base_tcp_pose_q = inv_transform(tcp_pose_q, self._coord_frame_q) 
         self.controller.move_linear(base_tcp_pose_q, elbow)
+
+    def servo_move_linear(self, pose, elbow=None):
+        """Executes a linear/cartesian move from the current TCP pose to the
+        specified pose in the reference coordinate frame.
+        """
+        check_pose(pose)
+        pose_q = euler2quat(pose, self._axes)
+        tcp_pose_q = inv_transform(self._tcp_q, pose_q)
+        base_tcp_pose_q = inv_transform(tcp_pose_q, self._coord_frame_q)
+        self.controller.servo_move_linear(base_tcp_pose_q, elbow)
+    def rel_move_linear(self, pose):
+        check_pose(pose)
+        pose_q = euler2quat(pose, self._axes)
+        tcp_pose_q = inv_transform(self._tcp_q, pose_q)
+        base_tcp_pose_q = inv_transform(tcp_pose_q, self._coord_frame_q)
+        self.controller.rel_move_linear(base_tcp_pose_q)
+
+
 
     def move_circular(self, via_pose, end_pose, elbow=None):
         """Executes a movement in a circular path from the current TCP pose,
